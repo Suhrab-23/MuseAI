@@ -1,0 +1,79 @@
+# MuseAI Configuration File
+
+# Paths
+paths:
+  style_raw: "data/style_raw"
+  style_processed: "data/style"
+  content_raw: "data/content/faces/raw"
+  content_processed: "data/content/faces"
+  metadata: "metadata"
+  checkpoints: "checkpoints"
+  outputs: "outputs"
+
+# Data preprocessing
+preprocessing:
+  image_size: 512
+  style_crop_mode: "center"  # center or random
+  content_face_expand: 1.4  # expand face bbox by this factor
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  random_seed: 42
+
+# Artists
+artists:
+  - "picasso"
+  - "rembrandt"
+
+# Model architecture
+model:
+  image_size: 512
+  artist_embed_dim: 128
+  encoder: "vgg19"
+  encoder_layers: ["relu1_1", "relu2_1", "relu3_1", "relu4_1"]
+  content_layer: "relu4_1"
+  style_layers: ["relu1_1", "relu2_1", "relu3_1", "relu4_1"]
+  decoder_channels: [512, 256, 128, 64]
+  
+# Training hyperparameters
+training:
+  batch_size: 8
+  num_epochs: 50
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  num_workers: 4
+  save_freq: 5  # save checkpoint every N epochs
+  
+  # Loss weights
+  loss_weights:
+    content: 1.0
+    style: 10.0
+    identity: 5.0
+    tv: 0.0001
+    
+  # Learning rate schedule
+  lr_scheduler:
+    type: "step"  # step or cosine
+    step_size: 20
+    gamma: 0.5
+
+# Evaluation
+evaluation:
+  metrics:
+    - "ssim"
+    - "lpips"
+    - "gram_distance"
+    - "identity_similarity"
+  batch_size: 4
+
+# Deployment
+deployment:
+  model_path: "checkpoints/final_model.pth"
+  host: "0.0.0.0"
+  port: 5000
+  upload_folder: "outputs/uploads"
+  result_folder: "outputs/results"
+  max_file_size: 16777216  # 16MB in bytes
+
+# Device
+device: "cuda"  # cuda or cpu

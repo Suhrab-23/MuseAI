@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# PyTorch - Exclude intermediate checkpoints but keep final model
+checkpoints/checkpoint_*.pth
+checkpoints/best_model.pth
+# Keep final_model.pth for deployment (will be committed)
+# !checkpoints/final_model.pth
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Outputs - Keep training samples/curves for presentation, ignore uploads/results
+# outputs/uploads/
+# outputs/results/
+# Keep these for documentation:
+# !outputs/training_samples/
+# !outputs/training_curves/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# Metadata catalogs are generated during preprocessing
+# Keep them commented out if your partner needs to see what was processed
+# metadata/*.csv
