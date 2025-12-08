@@ -86,6 +86,7 @@ python src/deployment/model_inference.py \
   --content path/to/face.jpg \
   --artist picasso \
   --output outputs/results/picasso_result.jpg
+  --alpha 1.0
 ```
 Rembrandt Example
 ```bash
@@ -93,6 +94,7 @@ python src/deployment/model_inference.py \
   --content path/to/face.jpg \
   --artist rembrandt \
   --output outputs/results/rembrandt_result.jpg
+  --alpha 1.0
 ```
 Results appear in:
 ```bash
