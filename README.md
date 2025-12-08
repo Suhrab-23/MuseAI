@@ -35,7 +35,7 @@ data/
 ```
 Place your raw images inside these folders.
 
-# 🛠️ Preprocessing
+# 🛠️ Step 1: Preprocessing
 Run:
 ```bash
 python src/preprocess/run_preprocessing.py
@@ -54,7 +54,7 @@ This will:
   - data/content/faces/
   - metadata/
 
-# 🖌️ Inference
+# 🖌️ Step 2: Inference
 Picasso Example
 ```bash
 python src/deployment/model_inference.py \
