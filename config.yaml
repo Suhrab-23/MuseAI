@@ -1,6 +1,8 @@
 # MuseAI Configuration File
 
-# Paths
+# --------------------------------------------------
+# PATHS
+# --------------------------------------------------
 paths:
   style_raw: "data/style_raw"
   style_processed: "data/style"
@@ -10,54 +12,96 @@ paths:
   checkpoints: "checkpoints"
   outputs: "outputs"
 
-# Data preprocessing
+# --------------------------------------------------
+# PREPROCESSING
+# --------------------------------------------------
 preprocessing:
   image_size: 512
-  style_crop_mode: "center"  # center or random
-  content_face_expand: 1.4  # expand face bbox by this factor
+  style_crop_mode: "center"        # center or random
+  content_face_expand: 1.4         # bounding box scale
   train_split: 0.7
   val_split: 0.15
   test_split: 0.15
   random_seed: 42
 
-# Artists
+# --------------------------------------------------
+# ARTISTS
+# --------------------------------------------------
 artists:
   - "picasso"
   - "rembrandt"
 
-# Model architecture
+# --------------------------------------------------
+# MODEL ARCHITECTURE
+# --------------------------------------------------
 model:
   image_size: 512
   artist_embed_dim: 128
+
   encoder: "vgg19"
-  encoder_layers: ["relu1_1", "relu2_1", "relu3_1", "relu4_1"]
+
+  # These must match what VGGEncoder actually exports
+  encoder_layers:
+    - "relu1_1"
+    - "relu2_1"
+    - "relu3_1"
+    - "relu4_1"
+
+  # For content / AdaIN
   content_layer: "relu4_1"
-  style_layers: ["relu1_1", "relu2_1", "relu3_1", "relu4_1"]
+
+  # Style layers used in Gram-matrix style loss
+  style_layers:
+    - "relu1_1"
+    - "relu2_1"
+    - "relu3_1"
+    - "relu4_1"
+
   decoder_channels: [512, 256, 128, 64]
-  
-# Training hyperparameters
+
+# --------------------------------------------------
+# TRAINING HYPERPARAMETERS
+# --------------------------------------------------
 training:
-  batch_size: 8
-  num_epochs: 50
+  batch_size: 4                # smaller batch to avoid OOM / shm issues
+  num_epochs: 60
   learning_rate: 0.0001
   weight_decay: 0.00001
-  num_workers: 4
-  save_freq: 5  # save checkpoint every N epochs
-  
-  # Loss weights
+  num_workers: 0               # IMPORTANT: avoids shared-memory bus errors
+  save_freq: 5
+
+  # LOSS WEIGHTS
+  # We now have a default set + per-artist overrides so we can
+  # make Rembrandt more portrait-like without touching Picasso.
   loss_weights:
-    content: 1.0
-    style: 10.0
-    identity: 5.0
-    tv: 0.0001
-    
-  # Learning rate schedule
+    default:
+      content: 0.5
+      style: 25.0
+      identity: 2.0
+      tv: 0.0001
+
+    per_artist:
+      picasso:
+        content: 0.5
+        style: 25.0
+        identity: 2.0
+        tv: 0.0001
+
+      rembrandt:
+        # More structure & identity, softer global style, more smoothing
+        content: 1.0
+        style: 8.0
+        identity: 4.0
+        tv: 0.0005
+
   lr_scheduler:
-    type: "step"  # step or cosine
+    type: "step"
     step_size: 20
     gamma: 0.5
 
-# Evaluation
+# --------------------------------------------------
+# EVALUATION
+# --------------------------------------------------
 evaluation:
   metrics:
     - "ssim"
@@ -66,14 +110,18 @@ evaluation:
     - "identity_similarity"
   batch_size: 4
 
-# Deployment
+# --------------------------------------------------
+# DEPLOYMENT
+# --------------------------------------------------
 deployment:
   model_path: "checkpoints/final_model.pth"
   host: "0.0.0.0"
   port: 5000
   upload_folder: "outputs/uploads"
   result_folder: "outputs/results"
-  max_file_size: 16777216  # 16MB in bytes
+  max_file_size: 16777216  # 16MB
 
-# Device
-device: "cuda"  # cuda or cpu
+# --------------------------------------------------
+# DEVICE
+# --------------------------------------------------
+device: "cuda"
