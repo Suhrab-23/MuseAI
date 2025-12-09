@@ -34,8 +34,14 @@ data/
            └── raw/         # ~1000 face images
 ```
 Place your raw images inside these folders.
+---
 
-# 🛠️ Step 1: Preprocessing
+# 🚀 Running MuseAI
+
+## Option 1: Terminal Usage
+
+### 🛠️ Step 1: Preprocessing
+
 Run:
 ```bash
 python src/preprocess/run_preprocessing.py
@@ -54,7 +60,7 @@ This will:
   - data/content/faces/
   - metadata/
 
-# 🖌️ Step 2: Inference
+### 🖌️ Step 2: Inference
 Picasso Example
 ```bash
 python src/deployment/model_inference.py \
@@ -75,6 +81,44 @@ Results appear in:
 ```bash
 outputs/results/
 ```
+
+---
+
+## Option 2: Web Application
+
+
+1. **Create a virtual environment**
+  ```bash
+  python -m venv venv
+  ```
+2. **Activate the virtual environment**
+  - On Windows:
+    ```bash
+    .\venv\Scripts\activate
+    ```
+  - On macOS/Linux:
+    ```bash
+    source venv/bin/activate
+    ```
+3. **Install requirements**
+  ```bash
+  pip install -r requirements.txt
+  ```
+4. **Run preprocessing**
+  ```bash
+  python src/preprocess/run_preprocessing.py
+  ```
+5. **Start the Flask app**
+  ```bash
+  python src/deployment/app.py
+  ```
+
+Open your browser and go to `http://localhost:5000`.
+
+Simply upload or drag an image, select an artist, set the style strength, and preview your result.
+
+![MuseAI Demo](demo_image/demo.png)
+
 # 🧩 Model Architecture Overview
 ```bash
 Input Face ─► VGG19 Encoder ──────────────────────────────┐
