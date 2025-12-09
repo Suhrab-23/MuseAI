@@ -35,7 +35,7 @@ data/
 ```
 Place your raw images inside these folders.
 
-# 🛠️ Preprocessing
+# 🛠️ Step 1: Preprocessing
 Run:
 ```bash
 python src/preprocess/run_preprocessing.py
@@ -54,38 +54,14 @@ This will:
   - data/content/faces/
   - metadata/
 
-# 🧠 Training
-Run:
-```bash
-python src/training/train.py
-```
-
-Training includes:
-
-- Multi-style training (Picasso + Rembrandt in same model)
-- Adaptive Instance Normalization
-- Artist-conditioned transformation layers
-- Identity preservation via FaceNet
-- Automatic checkpointing:
-    -  best model → checkpoints/best_model.pth
-    -  periodic checkpoints every N epochs
-
-Sample images saved every 5 epochs to:
-```bash
-outputs/training_samples/
-```
-Training curves saved to:
-```bash
-outputs/training_curves/
-```
-
-# 🖌️ Inference
+# 🖌️ Step 2: Inference
 Picasso Example
 ```bash
 python src/deployment/model_inference.py \
   --content path/to/face.jpg \
   --artist picasso \
   --output outputs/results/picasso_result.jpg
+  --alpha 1.0
 ```
 Rembrandt Example
 ```bash
@@ -93,6 +69,7 @@ python src/deployment/model_inference.py \
   --content path/to/face.jpg \
   --artist rembrandt \
   --output outputs/results/rembrandt_result.jpg
+  --alpha 1.0
 ```
 Results appear in:
 ```bash
