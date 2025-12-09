@@ -78,17 +78,13 @@
 
             <div id="errorMessage" class="error-message" style="display: none;"></div>
         </main>
-
-        <footer>
-            <p>MuseAI - Identity-Preserving Neural Style Transfer</p>
-            <p class="tech-stack">Powered by PyTorch, VGG19, AdaIN & FaceNet</p>
-        </footer>
     </div>
 
     <script>
         let selectedFile = null;
         let selectedArtist = 'picasso';
         let alphaValue = 1.0;
+        let currentDownloadUrl = null;
 
         // File upload handling
         const uploadArea = document.getElementById('uploadArea');
@@ -197,14 +193,22 @@
                     // Show result
                     const resultImage = document.getElementById('resultImage');
                     resultImage.src = data.result_url + '?t=' + Date.now();
-                    resultSection.style.display = 'block';
                     
-                    // Setup download
+                    // Store download URL
+                    currentDownloadUrl = data.download_url;
+                    
+                    // Wait for image to load before showing result section
+                    resultImage.onload = () => {
+                        resultSection.style.display = 'block';
+                    };
+                    
+                    resultImage.onerror = () => {
+                        showError('Failed to load result image');
+                    };
+                    
+                    // Setup download with original filename
                     document.getElementById('downloadBtn').onclick = () => {
-                        const link = document.createElement('a');
-                        link.href = data.result_url;
-                        link.download = `museai_${selectedArtist}_${Date.now()}.jpg`;
-                        link.click();
+                        window.location.href = currentDownloadUrl;
                     };
                 } else {
                     showError(data.error || 'An error occurred during stylization');

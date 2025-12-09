@@ -16,9 +16,10 @@ from deployment.model_inference import StyleTransferInference
 
 app = Flask(__name__)
 
-# Configuration
-UPLOAD_FOLDER = 'outputs/uploads'
-RESULT_FOLDER = 'outputs/results'
+# Configuration - use absolute paths from project root
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+UPLOAD_FOLDER = str(PROJECT_ROOT / 'outputs' / 'uploads')
+RESULT_FOLDER = str(PROJECT_ROOT / 'outputs' / 'results')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
 
@@ -32,6 +33,9 @@ os.makedirs(RESULT_FOLDER, exist_ok=True)
 
 # Global model instance
 model = None
+
+# Store mapping of file_id to original filename
+filename_map = {}
 
 
 def allowed_file(filename):
@@ -106,13 +110,17 @@ def stylize():
         
         # Save uploaded file
         file_id = str(uuid.uuid4())
-        filename = secure_filename(file.filename)
-        file_ext = filename.rsplit('.', 1)[1].lower()
+        original_filename = secure_filename(file.filename)
+        file_ext = original_filename.rsplit('.', 1)[1].lower()
+        original_name_no_ext = original_filename.rsplit('.', 1)[0]
         
         upload_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{file_id}.{file_ext}')
         file.save(upload_path)
         
-        print(f"📸 Received image: {filename}")
+        # Store original filename mapping
+        filename_map[file_id] = original_filename
+        
+        print(f"📸 Received image: {original_filename}")
         print(f"   Artist: {artist}")
         print(f"   Style strength: {alpha}")
         
@@ -126,11 +134,13 @@ def stylize():
         
         print(f"✅ Stylization complete")
         
-        # Return result URL
+        # Return result URL with original filename
         return jsonify({
             'success': True,
             'result_url': f'/api/result/{file_id}.jpg',
-            'artist': artist
+            'download_url': f'/api/download/{file_id}',
+            'artist': artist,
+            'original_filename': original_filename
         })
     
     except Exception as e:
@@ -140,12 +150,39 @@ def stylize():
 
 @app.route('/api/result/<filename>')
 def get_result(filename):
-    """Serve result image"""
+    """Serve result image for preview"""
     try:
         result_path = os.path.join(app.config['RESULT_FOLDER'], filename)
+        if not os.path.exists(result_path):
+            return jsonify({'error': 'File not found'}), 404
         return send_file(result_path, mimetype='image/jpeg')
     except Exception as e:
+        print(f"Error serving result: {e}")
         return jsonify({'error': 'File not found'}), 404
+
+
+@app.route('/api/download/<file_id>')
+def download_result(file_id):
+    """Download result image with original filename"""
+    try:
+        result_path = os.path.join(app.config['RESULT_FOLDER'], f'{file_id}.jpg')
+        
+        if not os.path.exists(result_path):
+            return jsonify({'error': 'File not found'}), 404
+        
+        # Get original filename
+        original_filename = filename_map.get(file_id, 'result.jpg')
+        
+        # Return file with original name
+        return send_file(
+            result_path,
+            mimetype='image/jpeg',
+            as_attachment=True,
+            download_name=original_filename
+        )
+    except Exception as e:
+        print(f"Error downloading result: {e}")
+        return jsonify({'error': 'Download failed'}), 500
 
 
 @app.route('/api/health')
