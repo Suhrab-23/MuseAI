@@ -44,9 +44,6 @@ def main():
     print("\n" + "="*70)
     print("✅ ALL PREPROCESSING COMPLETE!")
     print("="*70)
-    print("\nYou can now proceed to training.")
-    print("Run: python src/training/train.py")
-
 
 if __name__ == '__main__':
     main()
